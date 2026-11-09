@@ -5,32 +5,48 @@ import {
   filterFaqs,
   calculateLoopCycle,
 } from './validation';
-import { FAQ_ITEMS } from '../config/siteConfig';
+import { FAQ_ITEMS, FAQ_ITEMS_BY_LANG } from '../config/siteConfig';
 
-test('validateContactInquiry rejects empty or invalid inputs', () => {
-  const result = validateContactInquiry({
-    fullName: 'أح',
-    contactMethod: '12345',
-    roleType: 'driver',
-    governorate: '',
-    message: 'قصير',
-  });
+test('validateContactInquiry rejects empty or invalid inputs in Arabic and English', () => {
+  const resultAr = validateContactInquiry(
+    {
+      fullName: 'أح',
+      contactMethod: '12345',
+      roleType: 'driver',
+      governorate: '',
+      message: 'قصير',
+    },
+    'ar'
+  );
 
-  assert.equal(result.valid, false);
-  assert.ok(result.errors.fullName);
-  assert.ok(result.errors.contactMethod);
-  assert.ok(result.errors.governorate);
-  assert.ok(result.errors.message);
+  assert.equal(resultAr.valid, false);
+  assert.ok(resultAr.errors.fullName);
+  assert.ok(resultAr.errors.contactMethod);
+  assert.ok(resultAr.errors.governorate);
+  assert.ok(resultAr.errors.message);
+
+  const resultEn = validateContactInquiry(
+    {
+      fullName: 'Jo',
+      contactMethod: 'invalid',
+      roleType: 'driver',
+      governorate: '',
+      message: 'short',
+    },
+    'en'
+  );
+  assert.equal(resultEn.valid, false);
+  assert.match(resultEn.errors.fullName ?? '', /Please enter your full name/);
 });
 
 test('validateContactInquiry accepts valid Egyptian mobile and valid email', () => {
   const phoneResult = validateContactInquiry({
-    fullName: 'أحمد محمود حسن',
+    fullName: 'Ahmed Mahmoud Hassan',
     contactMethod: '01012345678',
     roleType: 'business_winch',
-    governorate: 'القاهرة',
-    message: 'أرغب في الانضمام كمقدم خدمة ونش إنقاذ في منطقة مدينة نصر والتجمع.',
-  });
+    governorate: 'Cairo',
+    message: 'I would like to join RoadX Business as a winch provider in Nasr City.',
+  }, 'en');
   assert.equal(phoneResult.valid, true);
   assert.equal(Object.keys(phoneResult.errors).length, 0);
 
@@ -40,20 +56,20 @@ test('validateContactInquiry accepts valid Egyptian mobile and valid email', () 
     roleType: 'driver',
     governorate: 'الإسكندرية',
     message: 'استفسار بخصوص موعد إطلاق التطبيق الرسمي وتفعيل ميزة Dashcam.',
-  });
+  }, 'ar');
   assert.equal(emailResult.valid, true);
 });
 
-test('filterFaqs filters by category and Arabic search query accurately', () => {
-  const all = filterFaqs(FAQ_ITEMS, 'all', '');
-  assert.equal(all.length, FAQ_ITEMS.length);
+test('filterFaqs filters by category and search query in both languages', () => {
+  const allAr = filterFaqs(FAQ_ITEMS, 'all', '');
+  assert.equal(allAr.length, FAQ_ITEMS.length);
 
-  const safetyOnly = filterFaqs(FAQ_ITEMS, 'safety', '');
-  assert.ok(safetyOnly.length >= 3);
-  assert.ok(safetyOnly.every((item) => item.category === 'safety'));
+  const safetyOnlyEn = filterFaqs(FAQ_ITEMS_BY_LANG.en, 'safety', '');
+  assert.ok(safetyOnlyEn.length >= 3);
+  assert.ok(safetyOnlyEn.every((item) => item.category === 'safety'));
 
-  const searchDanger = filterFaqs(FAQ_ITEMS, 'all', 'وضع الخطر');
-  assert.ok(searchDanger.length >= 2);
+  const searchDangerEn = filterFaqs(FAQ_ITEMS_BY_LANG.en, 'all', 'Danger Mode');
+  assert.ok(searchDangerEn.length >= 2);
 });
 
 test('calculateLoopCycle computes illustrative segment counts cleanly', () => {

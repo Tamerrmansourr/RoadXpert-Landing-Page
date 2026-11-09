@@ -55,10 +55,13 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
           isDarkSurface ? 'text-white' : 'text-slate-950'
         }`}
       >
-        Road<span className="text-[#0066FF]">X</span>
+        Road<span className="text-[#0066FF]">Xpert</span>{' '}
+        <span className={isDarkSurface ? 'text-slate-200 font-semibold' : 'text-slate-800 font-semibold'}>
+          Technology
+        </span>
         {variant === 'business' && (
           <span className="font-medium text-sm text-slate-400 ms-1.5">
-            Business
+            · RoadX Business
           </span>
         )}
       </span>

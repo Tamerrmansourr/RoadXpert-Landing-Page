@@ -1,4 +1,4 @@
-import type { FaqItem } from '../config/siteConfig';
+import type { FaqItem, Language } from '../config/siteConfig';
 
 export interface ContactInquiryInput {
   fullName: string;
@@ -16,28 +16,42 @@ export interface ValidationResult {
 const EGYPT_PHONE_REGEX = /^(?:\+?20|0)?1[0125][0-9]{8}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function validateContactInquiry(input: ContactInquiryInput): ValidationResult {
+export function validateContactInquiry(
+  input: ContactInquiryInput,
+  lang: Language = 'ar'
+): ValidationResult {
   const errors: Partial<Record<keyof ContactInquiryInput, string>> = {};
+  const isEn = lang === 'en';
 
   const trimmedName = input.fullName.trim();
   if (!trimmedName || trimmedName.length < 3) {
-    errors.fullName = 'يرجى إدخال الاسم بالكامل (3 أحرف على الأقل).';
+    errors.fullName = isEn
+      ? 'Please enter your full name (at least 3 characters).'
+      : 'يرجى إدخال الاسم بالكامل (3 أحرف على الأقل).';
   }
 
   const trimmedContact = input.contactMethod.trim().replace(/\s+/g, '');
   if (!trimmedContact) {
-    errors.contactMethod = 'يرجى إدخال رقم موبايل مصري صحيح أو بريد إلكتروني.';
+    errors.contactMethod = isEn
+      ? 'Please enter a valid Egyptian mobile number or email address.'
+      : 'يرجى إدخال رقم موبايل مصري صحيح أو بريد إلكتروني.';
   } else if (!EGYPT_PHONE_REGEX.test(trimmedContact) && !EMAIL_REGEX.test(trimmedContact)) {
-    errors.contactMethod = 'يرجى التأكد من صحة رقم الموبايل المصري (مثال: 010XXXXXXXX) أو البريد الإلكتروني.';
+    errors.contactMethod = isEn
+      ? 'Please verify your Egyptian mobile number (e.g., 010XXXXXXXX) or email address.'
+      : 'يرجى التأكد من صحة رقم الموبايل المصري (مثال: 010XXXXXXXX) أو البريد الإلكتروني.';
   }
 
   if (!input.governorate.trim()) {
-    errors.governorate = 'يرجى اختيار المحافظة أو نطاق التواجد.';
+    errors.governorate = isEn
+      ? 'Please select your governorate or operating area.'
+      : 'يرجى اختيار المحافظة أو نطاق التواجد.';
   }
 
   const trimmedMsg = input.message.trim();
   if (!trimmedMsg || trimmedMsg.length < 10) {
-    errors.message = 'يرجى كتابة تفاصيل رسالتك أو استفسارك (10 أحرف على الأقل).';
+    errors.message = isEn
+      ? 'Please write the details of your message or inquiry (at least 10 characters).'
+      : 'يرجى كتابة تفاصيل رسالتك أو استفسارك (10 أحرف على الأقل).';
   }
 
   return {
@@ -71,15 +85,10 @@ export interface LoopRecordingSimulation {
   estimatedTotalLoopMinutes: number;
 }
 
-/**
- * Pure helper to illustrate how Loop Recording manages storage cycles
- * without making absolute hardware guarantees.
- */
 export function calculateLoopCycle(
   segmentDurationMinutes: 1 | 3 | 5,
   allocatedStorageGb: 2 | 4 | 8
 ): LoopRecordingSimulation {
-  // Approximate standard compressed video footprint (~90 MB per minute as an illustrative baseline)
   const approxMbPerMinute = 90;
   const segmentMb = segmentDurationMinutes * approxMbPerMinute;
   const totalMb = allocatedStorageGb * 1024;

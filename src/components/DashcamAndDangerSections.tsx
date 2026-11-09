@@ -11,16 +11,20 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 import {
-  DASHCAM_SHOWCASE_CONTENT,
-  DANGER_MODE_CONTENT,
+  DASHCAM_SHOWCASE_CONTENT_BY_LANG,
+  DANGER_MODE_CONTENT_BY_LANG,
 } from '../config/siteConfig';
+import { useLanguage } from '../context/LanguageContext';
 import { calculateLoopCycle } from '../utils/validation';
 
 export const DashcamAndDangerSections: React.FC = () => {
+  const { lang, isRTL } = useLanguage();
   const [segmentDuration, setSegmentDuration] = useState<1 | 3 | 5>(3);
   const [storageGb, setStorageGb] = useState<2 | 4 | 8>(4);
   const [backgroundSimActive, setBackgroundSimActive] = useState(true);
 
+  const dashcamContent = DASHCAM_SHOWCASE_CONTENT_BY_LANG[lang];
+  const dangerContent = DANGER_MODE_CONTENT_BY_LANG[lang];
   const loopSim = calculateLoopCycle(segmentDuration, storageGb);
 
   return (
@@ -31,31 +35,32 @@ export const DashcamAndDangerSections: React.FC = () => {
         className="py-16 lg:py-24 bg-slate-50 border-b border-slate-200/80"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          {/* Header */}
           <div className="max-w-3xl space-y-3">
             <div className="text-xs font-medium text-[#0052CC]">
-              <span>{DASHCAM_SHOWCASE_CONTENT.kicker}</span>
+              <span>{dashcamContent.kicker}</span>
             </div>
             <h2 className="font-display font-bold text-2xl sm:text-4xl text-slate-950 tracking-tight">
-              {DASHCAM_SHOWCASE_CONTENT.title}
+              {dashcamContent.title}
             </h2>
             <p className="text-base text-slate-600 leading-relaxed">
-              {DASHCAM_SHOWCASE_CONTENT.description}
+              {dashcamContent.description}
             </p>
           </div>
 
-          {/* Wide Interactive Showcase Split */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            {/* Right Column: Interactive Landscape Phone Dashcam & Loop Simulator */}
+            {/* Interactive Landscape Phone Dashcam & Loop Simulator */}
             <div className="lg:col-span-7 rounded-2xl bg-slate-950 text-white p-6 sm:p-8 border border-slate-800 flex flex-col justify-between space-y-6">
-              {/* Top Bar of Simulator */}
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div className="space-y-1">
                   <span className="text-xs text-[#60A5FA] font-medium block">
-                    معاينة تفاعلية غير مضللة · نظام إدارة التسجيلات
+                    {isRTL
+                      ? 'معاينة تفاعلية غير مضللة · نظام إدارة التسجيلات'
+                      : 'Interactive Recording Management Preview'}
                   </span>
                   <h3 className="font-display font-bold text-lg text-white">
-                    محاكي التسجيل الدوري (Loop Recording) والعمل في الخلفية
+                    {isRTL
+                      ? 'محاكي التسجيل الدوري (Loop Recording) والعمل في الخلفية'
+                      : 'Loop Recording & Background Mode Simulator'}
                   </h3>
                 </div>
 
@@ -69,12 +74,15 @@ export const DashcamAndDangerSections: React.FC = () => {
                   }`}
                 >
                   {backgroundSimActive
-                    ? 'وضع الخلفية: نشط مع الخرائط'
-                    : 'وضع الشاشة الكاملة: الكاميرا فقط'}
+                    ? isRTL
+                      ? 'وضع الخلفية: نشط مع الخرائط'
+                      : 'Background Mode: Active with Maps'
+                    : isRTL
+                    ? 'وضع الشاشة الكاملة: الكاميرا فقط'
+                    : 'Full Screen Mode: Camera View'}
                 </button>
               </div>
 
-              {/* Landscape Phone Viewport Mockup */}
               <div className="rounded-2xl bg-[#090D16] border border-white/15 p-4 sm:p-5 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
                   {/* Road Viewfinder Illustration */}
@@ -118,18 +126,29 @@ export const DashcamAndDangerSections: React.FC = () => {
 
                     <div className="relative z-10 flex items-center justify-between text-xs">
                       <span className="text-white font-semibold">
-                        RoadX Dashcam · {backgroundSimActive ? 'تسجيل في الخلفية' : 'معاينة الكاميرا'}
+                        RoadX Dashcam ·{' '}
+                        {backgroundSimActive
+                          ? isRTL
+                            ? 'تسجيل في الخلفية'
+                            : 'Background Recording'
+                          : isRTL
+                          ? 'معاينة الكاميرا'
+                          : 'Camera View'}
                       </span>
                       <span className="font-mono-tabular text-slate-300">
-                        {segmentDuration} min / مقطع
+                        {segmentDuration} min / {isRTL ? 'مقطع' : 'clip'}
                       </span>
                     </div>
 
                     <div className="relative z-10 bg-slate-950/90 border border-white/10 rounded-lg p-2.5 flex items-center justify-between text-xs">
                       <span className="text-slate-300">
                         {backgroundSimActive
-                          ? 'يعمل في الخلفية أثناء فتح الملاحة (حسب أذونات النظام)'
-                          : 'عرض مباشر للطريق مع تقسيم تلقائي للمقاطع'}
+                          ? isRTL
+                            ? 'يعمل في الخلفية أثناء فتح الملاحة (حسب أذونات النظام)'
+                            : 'Runs in background alongside navigation (subject to OS permissions)'
+                          : isRTL
+                          ? 'عرض مباشر للطريق مع تقسيم تلقائي للمقاطع'
+                          : 'Live road view with automated clip segmentation'}
                       </span>
                       <Video className="w-4 h-4 text-[#0075FF] shrink-0" />
                     </div>
@@ -138,24 +157,26 @@ export const DashcamAndDangerSections: React.FC = () => {
                   {/* Segment Queue Visualization */}
                   <div className="sm:col-span-5 space-y-2">
                     <div className="flex items-center justify-between text-xs text-slate-400">
-                      <span>دورة المقاطع (Loop Queue)</span>
+                      <span>
+                        {isRTL ? 'دورة المقاطع (Loop Queue)' : 'Loop Segment Queue'}
+                      </span>
                       <RotateCw className="w-3.5 h-3.5 text-[#60A5FA]" />
                     </div>
                     <div className="space-y-1.5 font-mono-tabular text-xs">
                       <div className="p-2 rounded-lg bg-white/5 border border-white/10 flex items-center justify-between text-slate-400">
                         <span>Clip_01 ({segmentDuration}m)</span>
-                        <span>يُستبدل عند الامتلاء</span>
+                        <span>{isRTL ? 'يُستبدل عند الامتلاء' : 'Recycled when full'}</span>
                       </div>
                       <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-400/30 flex items-center justify-between text-amber-200">
                         <span>Clip_02 ({segmentDuration}m)</span>
                         <span className="inline-flex items-center gap-1">
                           <FolderLock className="w-3 h-3" />
-                          محمي
+                          {isRTL ? 'محمي' : 'Locked'}
                         </span>
                       </div>
                       <div className="p-2 rounded-lg bg-[#0052CC]/25 border border-[#0066FF]/50 flex items-center justify-between text-white">
                         <span>Clip_03 ({segmentDuration}m)</span>
-                        <span>قيد التسجيل</span>
+                        <span>{isRTL ? 'قيد التسجيل' : 'Recording'}</span>
                       </div>
                     </div>
                   </div>
@@ -166,7 +187,9 @@ export const DashcamAndDangerSections: React.FC = () => {
                   <div className="space-y-1.5">
                     <label className="text-xs text-slate-400 flex items-center gap-1.5">
                       <SlidersHorizontal className="w-3.5 h-3.5 text-[#60A5FA]" />
-                      <span>مدة المقطع الواحد:</span>
+                      <span>
+                        {isRTL ? 'مدة المقطع الواحد:' : 'Single Clip Duration:'}
+                      </span>
                     </label>
                     <div className="grid grid-cols-3 gap-1.5">
                       {([1, 3, 5] as const).map((min) => (
@@ -180,7 +203,9 @@ export const DashcamAndDangerSections: React.FC = () => {
                               : 'bg-white/5 text-slate-300 hover:bg-white/10'
                           }`}
                         >
-                          {min} {min === 1 ? 'دقيقة' : 'دقائق'}
+                          {isRTL
+                            ? `${min} ${min === 1 ? 'دقيقة' : 'دقائق'}`
+                            : `${min} min`}
                         </button>
                       ))}
                     </div>
@@ -188,7 +213,9 @@ export const DashcamAndDangerSections: React.FC = () => {
 
                   <div className="space-y-1.5">
                     <label className="text-xs text-slate-400 block">
-                      المساحة المخصصة للتسجيل الدوري:
+                      {isRTL
+                        ? 'المساحة المخصصة للتسجيل الدوري:'
+                        : 'Allocated Loop Storage:'}
                     </label>
                     <div className="grid grid-cols-3 gap-1.5">
                       {([2, 4, 8] as const).map((gb) => (
@@ -210,29 +237,44 @@ export const DashcamAndDangerSections: React.FC = () => {
                 </div>
               </div>
 
-              {/* Calculated Loop Summary */}
               <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-slate-300 pt-1">
-                <span>
-                  سعة الدورة التقديرية:{' '}
-                  <strong className="font-mono-tabular text-white">
-                    ~{loopSim.estimatedActiveSegments} مقطع
-                  </strong>{' '}
-                  (حوالي{' '}
-                  <strong className="font-mono-tabular text-white">
-                    {loopSim.estimatedTotalLoopMinutes} دقيقة
-                  </strong>{' '}
-                  قبل تدوير أقدم مقطع غير محمي)
-                </span>
+                {isRTL ? (
+                  <span>
+                    سعة الدورة التقديرية:{' '}
+                    <strong className="font-mono-tabular text-white">
+                      ~{loopSim.estimatedActiveSegments} مقطع
+                    </strong>{' '}
+                    (حوالي{' '}
+                    <strong className="font-mono-tabular text-white">
+                      {loopSim.estimatedTotalLoopMinutes} دقيقة
+                    </strong>{' '}
+                    قبل تدوير أقدم مقطع غير محمي)
+                  </span>
+                ) : (
+                  <span>
+                    Estimated cycle capacity:{' '}
+                    <strong className="font-mono-tabular text-white">
+                      ~{loopSim.estimatedActiveSegments} clips
+                    </strong>{' '}
+                    (approx.{' '}
+                    <strong className="font-mono-tabular text-white">
+                      {loopSim.estimatedTotalLoopMinutes} minutes
+                    </strong>{' '}
+                    before recycling oldest unlocked clip)
+                  </span>
+                )}
                 <span className="text-slate-400">
-                  تقدير توضيحي يختلف حسب دقة كاميرا الهاتف
+                  {isRTL
+                    ? 'تقدير توضيحي يختلف حسب دقة كاميرا الهاتف'
+                    : 'Illustrative estimate; varies by camera resolution'}
                 </span>
               </div>
             </div>
 
-            {/* Left Column: Detailed Explanations & Technical Constraints */}
+            {/* Detailed Explanations & Technical Constraints */}
             <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
               <div className="space-y-4">
-                {DASHCAM_SHOWCASE_CONTENT.features.map((item) => (
+                {dashcamContent.features.map((item) => (
                   <div
                     key={item.title}
                     className="p-5 rounded-2xl bg-white border border-slate-200/90 space-y-2"
@@ -247,14 +289,13 @@ export const DashcamAndDangerSections: React.FC = () => {
                 ))}
               </div>
 
-              {/* Technical Constraints Box */}
               <div className="p-5 rounded-2xl bg-white border border-slate-200/90 space-y-3">
                 <div className="flex items-center gap-2 text-slate-900 font-display font-bold text-sm">
                   <Smartphone className="w-4 h-4 text-[#0052CC]" />
-                  <span>الأذونات والضوابط التقنية للتسجيل</span>
+                  <span>{dashcamContent.technicalConstraintsTitle}</span>
                 </div>
                 <ul className="space-y-2 text-xs text-slate-600 leading-relaxed">
-                  {DASHCAM_SHOWCASE_CONTENT.technicalConstraints.map((note) => (
+                  {dashcamContent.technicalConstraints.map((note) => (
                     <li key={note} className="flex items-start gap-2">
                       <span className="text-[#0052CC] font-bold">·</span>
                       <span>{note}</span>
@@ -273,17 +314,16 @@ export const DashcamAndDangerSections: React.FC = () => {
         className="py-16 lg:py-24 bg-[#0B0F17] bg-road-grid-dark text-white border-b border-slate-800"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          {/* Header with Measured Crimson Accents */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-7 space-y-3">
               <div className="text-xs font-semibold text-red-400">
-                <span>{DANGER_MODE_CONTENT.kicker}</span>
+                <span>{dangerContent.kicker}</span>
               </div>
               <h2 className="font-display font-bold text-2xl sm:text-4xl text-white tracking-tight">
-                {DANGER_MODE_CONTENT.title}
+                {dangerContent.title}
               </h2>
               <p className="text-base text-slate-300 leading-relaxed">
-                {DANGER_MODE_CONTENT.subtitle}
+                {dangerContent.subtitle}
               </p>
             </div>
 
@@ -291,15 +331,14 @@ export const DashcamAndDangerSections: React.FC = () => {
               <div className="p-4 rounded-xl bg-red-950/35 border border-red-500/35 flex items-center gap-3">
                 <ShieldAlert className="w-6 h-6 text-red-400 shrink-0" />
                 <p className="text-xs text-red-100 leading-relaxed">
-                  صُمم وضع الخطر لتأمين التسجيلات وإشعار جهات الطوارئ التي تحددها بنفسك داخل التطبيق، وفق الأذونات والاتصال المتاح.
+                  {dangerContent.badgeNote}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Three Operational Pillars of Danger Mode */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {DANGER_MODE_CONTENT.steps.map((item, idx) => (
+            {dangerContent.steps.map((item, idx) => (
               <div
                 key={item.step}
                 className="p-6 rounded-2xl bg-[#111622] border border-white/10 flex flex-col justify-between space-y-5"
@@ -325,22 +364,19 @@ export const DashcamAndDangerSections: React.FC = () => {
                 </div>
 
                 <div className="pt-3 border-t border-white/10 text-xs text-slate-400">
-                  {idx === 0 && 'يعمل محليًا فور التفعيل داخل التطبيق'}
-                  {idx === 1 && 'يتطلب تحديد جهات الاتصال مسبقًا ومنح الأذونات'}
-                  {idx === 2 && 'يتطلب اتصالًا بالإنترنت وتفعيل الميزة بالحساب'}
+                  {item.footer}
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Transparent Scope & Limitations Box */}
           <div className="rounded-2xl bg-[#111622] border border-red-500/30 p-6 space-y-4">
             <div className="flex items-center gap-2.5 text-red-300 font-display font-bold text-base">
               <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
-              <span>توضيح مهم حول حدود عمل وضع الخطر</span>
+              <span>{dangerContent.disclaimersTitle}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
-              {DANGER_MODE_CONTENT.strictDisclaimers.map((disclaimer) => (
+              {dangerContent.strictDisclaimers.map((disclaimer) => (
                 <div
                   key={disclaimer}
                   className="p-4 rounded-xl bg-black/30 border border-white/10"

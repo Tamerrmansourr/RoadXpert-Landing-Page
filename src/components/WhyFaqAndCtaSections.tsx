@@ -10,13 +10,13 @@ import {
   FileCheck2,
 } from 'lucide-react';
 import {
-  WHY_ROADX_CONTENT,
-  FAQ_ITEMS,
-  LAUNCH_CONFIG,
+  WHY_ROADX_CONTENT_BY_LANG,
+  FAQ_ITEMS_BY_LANG,
   COMPANY_LEGAL_INFO,
-  NAVBAR_LINKS,
+  NAVBAR_LINKS_BY_LANG,
   PageView,
 } from '../config/siteConfig';
+import { useLanguage } from '../context/LanguageContext';
 import {
   ContactInquiryInput,
   validateContactInquiry,
@@ -35,46 +35,75 @@ interface SubmittedInquiry extends ContactInquiryInput {
   submittedAt: string;
 }
 
-const EGYPT_GOVERNORATES = [
-  'القاهرة',
-  'الجيزة',
-  'الإسكندرية',
-  'القليوبية',
-  'الدقهلية',
-  'الشرقية',
-  'الغربية',
-  'المنوفية',
-  'البحيرة',
-  'السويس',
-  'الإسماعيلية',
-  'بورسعيد',
-  'أسيوط',
-  'سوهاج',
-  'المنيا',
-  'بني سويف',
-  'الفيوم',
-  'أسوان',
-  'الأقصر',
-  'البحر الأحمر',
-  'محافظة أخرى',
-];
+const EGYPT_GOVERNORATES_BY_LANG = {
+  en: [
+    'Cairo',
+    'Giza',
+    'Alexandria',
+    'Qalyubia',
+    'Dakahlia',
+    'Sharqia',
+    'Gharbia',
+    'Monufia',
+    'Beheira',
+    'Suez',
+    'Ismailia',
+    'Port Said',
+    'Assiut',
+    'Sohag',
+    'Minya',
+    'Beni Suef',
+    'Faiyum',
+    'Aswan',
+    'Luxor',
+    'Red Sea',
+    'Other Governorate',
+  ],
+  ar: [
+    'القاهرة',
+    'الجيزة',
+    'الإسكندرية',
+    'القليوبية',
+    'الدقهلية',
+    'الشرقية',
+    'الغربية',
+    'المنوفية',
+    'البحيرة',
+    'السويس',
+    'الإسماعيلية',
+    'بورسعيد',
+    'أسيوط',
+    'سوهاج',
+    'المنيا',
+    'بني سويف',
+    'الفيوم',
+    'أسوان',
+    'الأقصر',
+    'البحر الأحمر',
+    'محافظة أخرى',
+  ],
+};
 
 export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
   onOpenDownloadModal,
   onNavigatePage,
   initialRoleType = 'driver',
 }) => {
-  // FAQ State
+  const { lang, isRTL } = useLanguage();
+  const whyContent = WHY_ROADX_CONTENT_BY_LANG[lang];
+  const faqItems = FAQ_ITEMS_BY_LANG[lang];
+  const navLinks = NAVBAR_LINKS_BY_LANG[lang];
+  const governorates = EGYPT_GOVERNORATES_BY_LANG[lang];
+
   const [faqCategory, setFaqCategory] = useState<string>('all');
   const [faqSearch, setFaqSearch] = useState<string>('');
   const [openFaqId, setOpenFaqId] = useState<string>('what-is-roadx');
 
-  // Contact / Provider Inquiry Form State
   const [formState, setFormState] = useState<ContactInquiryInput>({
     fullName: '',
     contactMethod: '',
     roleType: initialRoleType,
-    governorate: 'القاهرة',
+    governorate: governorates[0],
     message: '',
   });
   const [formErrors, setFormErrors] = useState<
@@ -83,16 +112,20 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
   const [submissions, setSubmissions] = useState<SubmittedInquiry[]>([]);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
 
-  // Sync external role selection when user clicks "Join RoadX Business"
   React.useEffect(() => {
-    setFormState((prev) => ({ ...prev, roleType: initialRoleType }));
-  }, [initialRoleType]);
+    setFormState((prev) => ({
+      ...prev,
+      roleType: initialRoleType,
+      governorate: EGYPT_GOVERNORATES_BY_LANG[lang][0],
+    }));
+    setFormErrors({});
+  }, [initialRoleType, lang]);
 
-  const filteredFaqs = filterFaqs(FAQ_ITEMS, faqCategory, faqSearch);
+  const filteredFaqs = filterFaqs(faqItems, faqCategory, faqSearch);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const validation = validateContactInquiry(formState);
+    const validation = validateContactInquiry(formState, lang);
     if (!validation.valid) {
       setFormErrors(validation.errors);
       setShowSuccessBanner(false);
@@ -103,7 +136,7 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
     const newEntry: SubmittedInquiry = {
       ...formState,
       id: `RX-${1000 + submissions.length + 1}`,
-      submittedAt: new Date().toLocaleTimeString('ar-EG', {
+      submittedAt: new Date().toLocaleTimeString(lang === 'ar' ? 'ar-EG' : 'en-US', {
         hour: '2-digit',
         minute: '2-digit',
       }),
@@ -118,6 +151,24 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
     }));
   };
 
+  const faqCategories = isRTL
+    ? [
+        { id: 'all', label: 'الكل' },
+        { id: 'general', label: 'عام' },
+        { id: 'safety', label: 'السلامة والتسجيل' },
+        { id: 'services', label: 'خدمات الطريق' },
+        { id: 'business', label: 'RoadX Business' },
+        { id: 'plans', label: 'الباقات والأجهزة' },
+      ]
+    : [
+        { id: 'all', label: 'All' },
+        { id: 'general', label: 'General' },
+        { id: 'safety', label: 'Safety & Recording' },
+        { id: 'services', label: 'Roadside Services' },
+        { id: 'business', label: 'RoadX Business' },
+        { id: 'plans', label: 'Plans & Devices' },
+      ];
+
   return (
     <>
       {/* SECTION 11 — WHY ROADX */}
@@ -125,24 +176,26 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="max-w-3xl space-y-3">
             <div className="text-xs font-medium text-[#0052CC]">
-              <span>{WHY_ROADX_CONTENT.kicker}</span>
+              <span>{whyContent.kicker}</span>
             </div>
             <h2 className="font-display font-bold text-2xl sm:text-4xl text-slate-950 tracking-tight">
-              {WHY_ROADX_CONTENT.title}
+              {whyContent.title}
             </h2>
             <p className="text-base text-slate-600 leading-relaxed">
-              {WHY_ROADX_CONTENT.subtitle}
+              {whyContent.subtitle}
             </p>
           </div>
 
-          {/* 4 Value Pillars */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {WHY_ROADX_CONTENT.valuePillars.map((pillar) => (
+            {whyContent.valuePillars.map((pillar) => (
               <div
                 key={pillar.index}
                 className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-3"
               >
-                <span className="font-mono-tabular font-bold text-sm text-[#0052CC] block">
+                <span
+                  dir="ltr"
+                  className="font-mono-tabular font-bold text-sm text-[#0052CC] inline-block"
+                >
                   {pillar.index}
                 </span>
                 <h3 className="font-display font-bold text-lg text-slate-950">
@@ -155,19 +208,18 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
             ))}
           </div>
 
-          {/* Conceptual Comparison Table */}
           <div className="rounded-2xl bg-white border border-slate-200/90 overflow-hidden">
             <div className="px-6 py-4 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-2">
               <h3 className="font-display font-bold text-base">
-                مقارنة مفاهيمية: التعامل التقليدي المتفرق مقابل منظومة RoadX المتكاملة
+                {whyContent.tableHeader}
               </h3>
               <span className="text-xs text-slate-400">
-                توضيح لتكامل الوظائف داخل تجربة واحدة
+                {whyContent.tableSubheader}
               </span>
             </div>
 
             <div className="divide-y divide-slate-200/80">
-              {WHY_ROADX_CONTENT.conceptualComparison.map((row) => (
+              {whyContent.conceptualComparison.map((row) => (
                 <div
                   key={row.aspect}
                   className="p-5 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
@@ -177,13 +229,13 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                   </div>
                   <div className="lg:col-span-4 text-xs sm:text-sm text-slate-500 bg-slate-50 p-3.5 rounded-xl border border-slate-200/60">
                     <span className="block font-semibold text-slate-700 mb-1">
-                      الأسلوب المتفرق التقليدي:
+                      {whyContent.traditionalLabel}
                     </span>
                     {row.traditionalApproach}
                   </div>
                   <div className="lg:col-span-5 text-xs sm:text-sm text-slate-900 bg-blue-50/50 p-3.5 rounded-xl border border-[#0052CC]/25">
                     <span className="block font-semibold text-[#0052CC] mb-1">
-                      داخل منظومة RoadX:
+                      {whyContent.roadxLabel}
                     </span>
                     {row.roadxApproach}
                   </div>
@@ -202,28 +254,27 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <div className="text-xs font-medium text-[#0052CC]">
-              <span>الأسئلة الشائعة · إجابات واضحة وشفافة</span>
+              <span>
+                {isRTL
+                  ? 'الأسئلة الشائعة · إجابات واضحة وشفافة'
+                  : 'Frequently Asked Questions · Transparent Answers'}
+              </span>
             </div>
             <h2 className="font-display font-bold text-2xl sm:text-4xl text-slate-950 tracking-tight">
-              كل ما تود معرفته عن RoadX وRoadX Business
+              {isRTL
+                ? 'كل ما تود معرفته عن RoadX وRoadX Business'
+                : 'Everything You Need to Know About RoadX & RoadX Business'}
             </h2>
             <p className="text-sm sm:text-base text-slate-600">
-              إجابات مباشرة حول طريقة عمل الميزات، الأذونات المطلوبة، والفرق بين تطبيقي المنظومة.
+              {isRTL
+                ? 'إجابات مباشرة حول طريقة عمل الميزات، الأذونات المطلوبة، والفرق بين تطبيقي المنظومة.'
+                : 'Direct answers on how features work, required device permissions, and how our driver and provider apps connect.'}
             </p>
           </div>
 
-          {/* Search & Category Filter Controls */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            {/* Category Tabs */}
             <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-100 border border-slate-200/80 rounded-xl">
-              {[
-                { id: 'all', label: 'الكل' },
-                { id: 'general', label: 'عام' },
-                { id: 'safety', label: 'السلامة والتسجيل' },
-                { id: 'services', label: 'خدمات الطريق' },
-                { id: 'business', label: 'RoadX Business' },
-                { id: 'plans', label: 'الباقات والأجهزة' },
-              ].map((cat) => (
+              {faqCategories.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
@@ -239,29 +290,37 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
               ))}
             </div>
 
-            {/* Search Input */}
             <div className="relative min-w-[240px]">
               <label htmlFor="faq-search-input" className="sr-only">
-                ابحث في الأسئلة الشائعة
+                {isRTL ? 'ابحث في الأسئلة الشائعة' : 'Search FAQs'}
               </label>
               <input
                 id="faq-search-input"
                 type="search"
                 value={faqSearch}
                 onChange={(e) => setFaqSearch(e.target.value)}
-                placeholder="ابحث عن سؤال (مثال: وضع الخطر، iPhone)..."
+                placeholder={
+                  isRTL
+                    ? 'ابحث عن سؤال (مثال: وضع الخطر، iPhone)...'
+                    : 'Search questions (e.g., Danger Mode, iPhone)...'
+                }
                 className="w-full ps-9 pe-4 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-[#0052CC] focus:outline-none"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search
+                className={`w-4 h-4 text-slate-400 absolute ${
+                  isRTL ? 'right-3' : 'left-3'
+                } top-1/2 -translate-y-1/2 pointer-events-none`}
+              />
             </div>
           </div>
 
-          {/* Accordion List */}
           <div className="space-y-3">
             {filteredFaqs.length === 0 ? (
               <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
                 <p className="text-sm font-semibold text-slate-800">
-                  لا توجد أسئلة مطابقة لعبارة البحث الحالية.
+                  {isRTL
+                    ? 'لا توجد أسئلة مطابقة لعبارة البحث الحالية.'
+                    : 'No questions match your current search query.'}
                 </p>
                 <button
                   type="button"
@@ -271,7 +330,7 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                   }}
                   className="text-xs font-semibold text-[#0052CC] underline cursor-pointer"
                 >
-                  إعادة عرض جميع الأسئلة
+                  {isRTL ? 'إعادة عرض جميع الأسئلة' : 'Reset all questions'}
                 </button>
               </div>
             ) : (
@@ -290,10 +349,8 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                       <button
                         type="button"
                         aria-expanded={isOpen}
-                        onClick={() =>
-                          setOpenFaqId(isOpen ? '' : faq.id)
-                        }
-                        className="w-full p-5 text-right flex items-center justify-between gap-4 cursor-pointer"
+                        onClick={() => setOpenFaqId(isOpen ? '' : faq.id)}
+                        className="w-full p-5 text-start flex items-center justify-between gap-4 cursor-pointer"
                       >
                         <div className="space-y-1">
                           <span className="text-[11px] text-[#0052CC] font-medium block">
@@ -336,37 +393,56 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            {/* Right Column: Contact Context & Pre-launch Transparency */}
             <div className="lg:col-span-5 space-y-6">
               <div className="space-y-3">
                 <div className="text-xs font-medium text-[#0052CC]">
-                  <span>تواصل معنا وانضم للمنظومة · Contact & Registration</span>
+                  <span>
+                    {isRTL
+                      ? 'تواصل معنا وانضم للمنظومة · Contact & Registration'
+                      : 'Contact & Provider Registration'}
+                  </span>
                 </div>
                 <h2 className="font-display font-bold text-2xl sm:text-4xl text-slate-950 tracking-tight">
-                  تواصل مع فريق RoadX أو سجّل اهتمامك كمقدم خدمة
+                  {isRTL
+                    ? 'تواصل مع فريق RoadX أو سجّل اهتمامك كمقدم خدمة'
+                    : 'Get in Touch with RoadX or Register as a Service Provider'}
                 </h2>
                 <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                  سواء كنت سائقًا ترغب في الاستفسار عن ميزات التطبيق أو مقدم خدمة سيارات (ونش، ميكانيكي، كاوتش، كهربائي) ترغب في الانضمام إلى RoadX Business في محافظتك، يمكنك تسجيل رسالتك هنا مباشرة.
+                  {isRTL
+                    ? 'سواء كنت سائقًا ترغب في الاستفسار عن ميزات التطبيق أو مقدم خدمة سيارات (ونش، ميكانيكي، كاوتش، كهربائي) ترغب في الانضمام إلى RoadX Business في محافظتك، يمكنك تسجيل رسالتك هنا مباشرة.'
+                    : 'Whether you are a driver inquiring about app features or an automotive service provider (Winch, Mechanic, Tires, Auto Electrician) looking to join RoadX Business in your governorate, submit your inquiry directly below.'}
                 </p>
               </div>
 
               <div className="p-5 rounded-2xl bg-white border border-slate-200/90 space-y-3 text-xs sm:text-sm">
                 <h3 className="font-display font-bold text-slate-950 text-base">
-                  تفاصيل النشاط التجاري وقنوات التواصل الرسمية
+                  {isRTL
+                    ? 'تفاصيل النشاط التجاري وقنوات التواصل الرسمية'
+                    : 'Official Business Details & Contact Channels'}
                 </h3>
                 <div className="space-y-2 text-slate-600 leading-relaxed">
                   <p>
-                    <strong className="text-slate-900">الاسم القانوني للنشاط التجاري:</strong>{' '}
+                    <strong className="text-slate-900">
+                      {isRTL
+                        ? 'الاسم القانوني للنشاط التجاري:'
+                        : 'Legal Business Name:'}
+                    </strong>{' '}
                     <span dir="ltr" className="font-semibold text-slate-900">
                       {COMPANY_LEGAL_INFO.legalName}
                     </span>
                   </p>
                   <p>
-                    <strong className="text-slate-900">العنوان:</strong>{' '}
-                    {COMPANY_LEGAL_INFO.addressLine1} — {COMPANY_LEGAL_INFO.addressLine2}
+                    <strong className="text-slate-900">
+                      {isRTL ? 'العنوان:' : 'Address:'}
+                    </strong>{' '}
+                    {isRTL
+                      ? `${COMPANY_LEGAL_INFO.addressLine1} — ${COMPANY_LEGAL_INFO.addressLine2}`
+                      : `${COMPANY_LEGAL_INFO.addressLine1En} — ${COMPANY_LEGAL_INFO.addressLine2En}`}
                   </p>
                   <p>
-                    <strong className="text-slate-900">هاتف النشاط التجاري:</strong>{' '}
+                    <strong className="text-slate-900">
+                      {isRTL ? 'هاتف النشاط التجاري:' : 'Business Phone:'}
+                    </strong>{' '}
                     <a
                       href={COMPANY_LEGAL_INFO.phoneHref}
                       dir="ltr"
@@ -376,7 +452,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     </a>
                   </p>
                   <p>
-                    <strong className="text-slate-900">موقع الويب:</strong>{' '}
+                    <strong className="text-slate-900">
+                      {isRTL ? 'موقع الويب:' : 'Website:'}
+                    </strong>{' '}
                     <a
                       href={COMPANY_LEGAL_INFO.website}
                       target="_blank"
@@ -388,7 +466,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     </a>
                   </p>
                   <p>
-                    <strong className="text-slate-900">المعرف الضريبي:</strong>{' '}
+                    <strong className="text-slate-900">
+                      {isRTL ? 'المعرف الضريبي:' : 'Tax ID:'}
+                    </strong>{' '}
                     <span dir="ltr" className="font-mono-tabular font-semibold text-slate-900">
                       {COMPANY_LEGAL_INFO.taxId}
                     </span>
@@ -396,7 +476,6 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                 </div>
               </div>
 
-              {/* Submitted Requests Log in Current Session */}
               {submissions.length > 0 && (
                 <div
                   data-testid="submitted-inquiries-list"
@@ -405,7 +484,11 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                   <div className="flex items-center justify-between">
                     <h3 className="font-display font-bold text-sm text-slate-950 flex items-center gap-2">
                       <FileCheck2 className="w-4 h-4 text-[#0052CC]" />
-                      <span>الطلبات المسجلة خلال جلستك ({submissions.length})</span>
+                      <span>
+                        {isRTL
+                          ? `الطلبات المسجلة خلال جلستك (${submissions.length})`
+                          : `Submitted Inquiries in Session (${submissions.length})`}
+                      </span>
                     </h3>
                   </div>
                   <div className="space-y-2">
@@ -416,7 +499,7 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                       >
                         <div className="flex items-center justify-between font-semibold text-slate-900">
                           <span>{item.fullName}</span>
-                          <span className="font-mono-tabular text-[#0052CC]">
+                          <span dir="ltr" className="font-mono-tabular text-[#0052CC]">
                             {item.id} · {item.submittedAt}
                           </span>
                         </div>
@@ -430,7 +513,6 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
               )}
             </div>
 
-            {/* Left Column: Validated Interactive Form */}
             <div className="lg:col-span-7">
               <form
                 onSubmit={handleFormSubmit}
@@ -439,10 +521,14 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
                   <h3 className="font-display font-bold text-lg text-slate-950">
-                    نموذج التواصل وتسجيل مقدمي الخدمات
+                    {isRTL
+                      ? 'نموذج التواصل وتسجيل مقدمي الخدمات'
+                      : 'Contact & Service Provider Inquiry Form'}
                   </h3>
                   <span className="text-xs text-slate-500">
-                    جميع الحقول مطلوبة لضمان دقة المتابعة
+                    {isRTL
+                      ? 'جميع الحقول مطلوبة لضمان دقة المتابعة'
+                      : 'All fields are required for accurate follow-up'}
                   </span>
                 </div>
 
@@ -454,23 +540,26 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                     <div className="space-y-1">
                       <p className="font-bold">
-                        تم تسجيل رسالتك بنجاح في سجل المتابعة.
+                        {isRTL
+                          ? 'تم تسجيل رسالتك بنجاح في سجل المتابعة.'
+                          : 'Your inquiry has been recorded successfully.'}
                       </p>
                       <p className="text-emerald-800">
-                        شكراً لتواصلك مع RoadX. سيتم مراجعة بياناتك والتواصل معك عبر وسيلة الاتصال المسجلة.
+                        {isRTL
+                          ? 'شكراً لتواصلك مع RoadX. سيتم مراجعة بياناتك والتواصل معك عبر وسيلة الاتصال المسجلة.'
+                          : 'Thank you for contacting RoadX. Our team will review your details and reach out via your provided contact method.'}
                       </p>
                     </div>
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Full Name */}
                   <div className="space-y-1.5">
                     <label
                       htmlFor="contact-full-name"
                       className="block text-xs font-semibold text-slate-800"
                     >
-                      الاسم بالكامل
+                      {isRTL ? 'الاسم بالكامل' : 'Full Name'}
                     </label>
                     <input
                       id="contact-full-name"
@@ -482,7 +571,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                           fullName: e.target.value,
                         }))
                       }
-                      placeholder="مثال: محمد أحمد علي"
+                      placeholder={
+                        isRTL ? 'مثال: محمد أحمد علي' : 'e.g., Mohamed Ahmed Ali'
+                      }
                       className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-slate-50 focus:bg-white focus:outline-none ${
                         formErrors.fullName
                           ? 'border-red-500 focus:border-red-600'
@@ -497,13 +588,14 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     )}
                   </div>
 
-                  {/* Phone or Email */}
                   <div className="space-y-1.5">
                     <label
                       htmlFor="contact-method"
                       className="block text-xs font-semibold text-slate-800"
                     >
-                      رقم الموبايل المصري أو البريد الإلكتروني
+                      {isRTL
+                        ? 'رقم الموبايل المصري أو البريد الإلكتروني'
+                        : 'Egyptian Mobile Number or Email'}
                     </label>
                     <input
                       id="contact-method"
@@ -517,7 +609,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                         }))
                       }
                       placeholder="010XXXXXXXX / name@email.com"
-                      className={`w-full px-3.5 py-2.5 text-sm text-right rounded-xl border bg-slate-50 focus:bg-white focus:outline-none font-mono-tabular ${
+                      className={`w-full px-3.5 py-2.5 text-sm ${
+                        isRTL ? 'text-right' : 'text-left'
+                      } rounded-xl border bg-slate-50 focus:bg-white focus:outline-none font-mono-tabular ${
                         formErrors.contactMethod
                           ? 'border-red-500 focus:border-red-600'
                           : 'border-slate-200 focus:border-[#0052CC]'
@@ -533,13 +627,12 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Role / Category Selection */}
                   <div className="space-y-1.5">
                     <label
                       htmlFor="contact-role-type"
                       className="block text-xs font-semibold text-slate-800"
                     >
-                      صفتك / نوع الطلب
+                      {isRTL ? 'صفتك / نوع الطلب' : 'Your Role / Inquiry Type'}
                     </label>
                     <select
                       id="contact-role-type"
@@ -553,30 +646,43 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                       }
                       className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-[#0052CC] focus:outline-none"
                     >
-                      <option value="driver">سائق / صاحب سيارة (تطبيق RoadX)</option>
+                      <option value="driver">
+                        {isRTL
+                          ? 'سائق / صاحب سيارة (تطبيق RoadX)'
+                          : 'Driver / Car Owner (RoadX App)'}
+                      </option>
                       <option value="business_winch">
-                        مقدم خدمة: ونش إنقاذ (RoadX Business)
+                        {isRTL
+                          ? 'مقدم خدمة: ونش إنقاذ (RoadX Business)'
+                          : 'Provider: Winch & Recovery (RoadX Business)'}
                       </option>
                       <option value="business_mechanic">
-                        مقدم خدمة: ميكانيكي سيارات (RoadX Business)
+                        {isRTL
+                          ? 'مقدم خدمة: ميكانيكي سيارات (RoadX Business)'
+                          : 'Provider: Auto Mechanic (RoadX Business)'}
                       </option>
                       <option value="business_tires">
-                        مقدم خدمة: فني كاوتش وإطارات (RoadX Business)
+                        {isRTL
+                          ? 'مقدم خدمة: فني كاوتش وإطارات (RoadX Business)'
+                          : 'Provider: Tire Specialist (RoadX Business)'}
                       </option>
                       <option value="business_electrician">
-                        مقدم خدمة: كهربائي سيارات (RoadX Business)
+                        {isRTL
+                          ? 'مقدم خدمة: كهربائي سيارات (RoadX Business)'
+                          : 'Provider: Auto Electrician (RoadX Business)'}
                       </option>
-                      <option value="general">استفسار عام / أخرى</option>
+                      <option value="general">
+                        {isRTL ? 'استفسار عام / أخرى' : 'General Inquiry / Other'}
+                      </option>
                     </select>
                   </div>
 
-                  {/* Governorate */}
                   <div className="space-y-1.5">
                     <label
                       htmlFor="contact-governorate"
                       className="block text-xs font-semibold text-slate-800"
                     >
-                      المحافظة / نطاق العمل
+                      {isRTL ? 'المحافظة / نطاق العمل' : 'Governorate / Operating Area'}
                     </label>
                     <select
                       id="contact-governorate"
@@ -589,7 +695,7 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                       }
                       className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-[#0052CC] focus:outline-none"
                     >
-                      {EGYPT_GOVERNORATES.map((gov) => (
+                      {governorates.map((gov) => (
                         <option key={gov} value={gov}>
                           {gov}
                         </option>
@@ -598,13 +704,14 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                   </div>
                 </div>
 
-                {/* Message */}
                 <div className="space-y-1.5">
                   <label
                     htmlFor="contact-message"
                     className="block text-xs font-semibold text-slate-800"
                   >
-                    تفاصيل الرسالة أو الخدمة التي تقدمها
+                    {isRTL
+                      ? 'تفاصيل الرسالة أو الخدمة التي تقدمها'
+                      : 'Message or Service Details'}
                   </label>
                   <textarea
                     id="contact-message"
@@ -616,7 +723,11 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                         message: e.target.value,
                       }))
                     }
-                    placeholder="اكتب استفسارك، أو اذكر تفاصيل الخدمة والمنطقة التي تغطيها إذا كنت مقدم خدمة..."
+                    placeholder={
+                      isRTL
+                        ? 'اكتب استفسارك، أو اذكر تفاصيل الخدمة والمنطقة التي تغطيها إذا كنت مقدم خدمة...'
+                        : 'Write your question, or describe the automotive service and coverage area you provide...'
+                    }
                     className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-slate-50 focus:bg-white focus:outline-none ${
                       formErrors.message
                         ? 'border-red-500 focus:border-red-600'
@@ -637,11 +748,13 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#0052CC] hover:bg-[#0043A8] text-white font-semibold text-sm rx-transition cursor-pointer whitespace-nowrap"
                   >
                     <Send className="w-4 h-4" />
-                    <span>إرسال الطلب</span>
+                    <span>{isRTL ? 'إرسال الطلب' : 'Submit Inquiry'}</span>
                   </button>
 
                   <span className="text-xs text-slate-500">
-                    بياناتك تُستخدم فقط للتواصل بخصوص خدمات ومنظومة RoadX.
+                    {isRTL
+                      ? 'بياناتك تُستخدم فقط للتواصل بخصوص خدمات ومنظومة RoadX.'
+                      : 'Your details are used strictly to follow up regarding RoadX services.'}
                   </span>
                 </div>
               </form>
@@ -675,13 +788,19 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
           <div className="space-y-3">
             <p className="text-xs sm:text-sm font-medium text-blue-100">
-              RoadX — أمان أكثر، وخدمات أقرب
+              {isRTL
+                ? 'RoadX — أمان أكثر، وخدمات أقرب'
+                : 'RoadX — Safer on the Road, Closer to Services'}
             </p>
             <h2 className="font-display font-extrabold text-3xl sm:text-5xl text-white tracking-tight">
-              كل اللي تحتاجه على الطريق، في مكان واحد.
+              {isRTL
+                ? 'كل اللي تحتاجه على الطريق، في مكان واحد.'
+                : 'Everything You Need on the Road, in One Place.'}
             </h2>
             <p className="text-base sm:text-lg text-blue-100 max-w-2xl mx-auto leading-relaxed">
-              ابدأ بتوثيق رحلاتك والاستفادة من أدوات المساعدة على القيادة والوصول إلى خدمات السيارات في مصر، أو انضم لمنظومة مقدمي الخدمات عبر RoadX Business.
+              {isRTL
+                ? 'ابدأ بتوثيق رحلاتك والاستفادة من أدوات المساعدة على القيادة والوصول إلى خدمات السيارات في مصر، أو انضم لمنظومة مقدمي الخدمات عبر RoadX Business.'
+                : 'Start documenting your trips, using smart driving assistance tools, and reaching car services in Egypt—or join our service provider ecosystem with RoadX Business.'}
             </p>
           </div>
 
@@ -692,7 +811,7 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
               className="inline-flex items-center gap-2.5 px-7 py-4 rounded-xl bg-white text-[#0052CC] hover:bg-blue-50 font-bold text-base shadow-sm rx-transition cursor-pointer whitespace-nowrap"
             >
               <Download className="w-5 h-5" />
-              <span>حمّل RoadX</span>
+              <span>{isRTL ? 'حمّل RoadX' : 'Download RoadX'}</span>
             </button>
 
             <button
@@ -701,7 +820,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
               className="inline-flex items-center gap-2.5 px-7 py-4 rounded-xl bg-[#0B0F17] text-white hover:bg-slate-900 border border-white/15 font-bold text-base rx-transition cursor-pointer whitespace-nowrap"
             >
               <Briefcase className="w-5 h-5 text-[#60A5FA]" />
-              <span>استكشف RoadX Business</span>
+              <span>
+                {isRTL ? 'استكشف RoadX Business' : 'Explore RoadX Business'}
+              </span>
             </button>
           </div>
         </div>
@@ -715,25 +836,35 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
             <div className="lg:col-span-4 space-y-4">
               <BrandLogo variant="inverse" size="md" />
               <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
-                منظومة تقنية للقيادة الآمنة وخدمات السيارات في مصر. تجمع بين حماية السائق، توثيق الرحلات عبر Dashcam، المساعدة على الطريق، وربط أصحاب السيارات بمقدمي الخدمات عبر RoadX Business.
+                {isRTL
+                  ? 'منظومة تقنية للقيادة الآمنة وخدمات السيارات في مصر. تجمع بين حماية السائق، توثيق الرحلات عبر Dashcam، المساعدة على الطريق، وربط أصحاب السيارات بمقدمي الخدمات عبر RoadX Business.'
+                  : 'An automotive technology ecosystem for safer driving and car services in Egypt—combining driver protection, Dashcam trip documentation, roadside assistance, and provider connectivity via RoadX Business.'}
               </p>
               <div className="pt-2 border-t border-white/10 space-y-1.5 text-xs text-slate-400">
                 <p>
-                  <span className="text-slate-500">الاسم القانوني:</span>{' '}
+                  <span className="text-slate-500">
+                    {isRTL ? 'الاسم القانوني:' : 'Legal Name:'}
+                  </span>{' '}
                   <strong dir="ltr" className="text-white font-semibold">
                     {COMPANY_LEGAL_INFO.legalName}
                   </strong>
                 </p>
                 <p>
-                  <span className="text-slate-500">المعرف الضريبي:</span>{' '}
+                  <span className="text-slate-500">
+                    {isRTL ? 'المعرف الضريبي:' : 'Tax ID:'}
+                  </span>{' '}
                   <strong dir="ltr" className="font-mono-tabular text-slate-200">
                     {COMPANY_LEGAL_INFO.taxId}
                   </strong>
                 </p>
                 <p className="leading-relaxed">
-                  <span className="text-slate-500">العنوان:</span>{' '}
+                  <span className="text-slate-500">
+                    {isRTL ? 'العنوان:' : 'Address:'}
+                  </span>{' '}
                   <span className="text-slate-300">
-                    {COMPANY_LEGAL_INFO.addressLine1} — {COMPANY_LEGAL_INFO.addressLine2}
+                    {isRTL
+                      ? `${COMPANY_LEGAL_INFO.addressLine1} — ${COMPANY_LEGAL_INFO.addressLine2}`
+                      : `${COMPANY_LEGAL_INFO.addressLine1En} — ${COMPANY_LEGAL_INFO.addressLine2En}`}
                   </span>
                 </p>
                 <p className="flex flex-wrap items-center gap-3 pt-1">
@@ -744,7 +875,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                   >
                     {COMPANY_LEGAL_INFO.phone}
                   </a>
-                  <span aria-hidden="true" className="text-slate-600">·</span>
+                  <span aria-hidden="true" className="text-slate-600">
+                    ·
+                  </span>
                   <a
                     href={COMPANY_LEGAL_INFO.website}
                     target="_blank"
@@ -761,10 +894,10 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
             {/* Section Links */}
             <div className="lg:col-span-3 space-y-3">
               <h3 className="font-display font-bold text-sm text-white">
-                أقسام الصفحة الرئيسية
+                {isRTL ? 'أقسام الصفحة الرئيسية' : 'Main Sections'}
               </h3>
               <ul className="space-y-2 text-sm">
-                {NAVBAR_LINKS.map((link) => (
+                {navLinks.map((link) => (
                   <li key={link.id}>
                     <a
                       href={link.href}
@@ -784,7 +917,7 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
             {/* Dedicated Pages & Legal Links */}
             <div className="lg:col-span-3 space-y-3">
               <h3 className="font-display font-bold text-sm text-white">
-                صفحات المنظومة والسياسات
+                {isRTL ? 'صفحات المنظومة والسياسات' : 'Platform Pages & Policies'}
               </h3>
               <ul className="space-y-2 text-sm">
                 <li>
@@ -793,7 +926,7 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     onClick={() => onNavigatePage('about')}
                     className="hover:text-white rx-transition cursor-pointer"
                   >
-                    من نحن (عن RoadX)
+                    {isRTL ? 'من نحن (عن RoadX)' : 'About Us (About RoadX)'}
                   </button>
                 </li>
                 <li>
@@ -802,7 +935,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     onClick={() => onNavigatePage('business')}
                     className="hover:text-white rx-transition cursor-pointer"
                   >
-                    صفحة RoadX Business لمقدمي الخدمات
+                    {isRTL
+                      ? 'صفحة RoadX Business لمقدمي الخدمات'
+                      : 'RoadX Business for Providers'}
                   </button>
                 </li>
                 <li>
@@ -811,7 +946,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     onClick={() => onNavigatePage('privacy')}
                     className="hover:text-white rx-transition cursor-pointer"
                   >
-                    سياسة الخصوصية والأذونات
+                    {isRTL
+                      ? 'سياسة الخصوصية والأذونات'
+                      : 'Privacy Policy & Permissions'}
                   </button>
                 </li>
                 <li>
@@ -820,7 +957,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     onClick={() => onNavigatePage('terms')}
                     className="hover:text-white rx-transition cursor-pointer"
                   >
-                    شروط الاستخدام وإخلاء المسؤولية
+                    {isRTL
+                      ? 'شروط الاستخدام وإخلاء المسؤولية'
+                      : 'Terms of Use & Disclaimers'}
                   </button>
                 </li>
                 <li>
@@ -829,7 +968,9 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
                     onClick={() => onNavigatePage('support')}
                     className="hover:text-white rx-transition cursor-pointer"
                   >
-                    الدعم الفني وجاهزية البيانات
+                    {isRTL
+                      ? 'الدعم الفني وجاهزية البيانات'
+                      : 'Support & Launch Readiness'}
                   </button>
                 </li>
               </ul>
@@ -838,27 +979,27 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
             {/* Store & Official Channels Status */}
             <div className="lg:col-span-2 space-y-3">
               <h3 className="font-display font-bold text-sm text-white">
-                المتاجر والتطبيقات
+                {isRTL ? 'المتاجر والتطبيقات' : 'Apps & Stores'}
               </h3>
               <div className="space-y-2 text-xs">
                 <button
                   type="button"
                   onClick={() => onOpenDownloadModal('client')}
-                  className="w-full py-2.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-right font-medium rx-transition cursor-pointer block"
+                  className="w-full py-2.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-start font-medium rx-transition cursor-pointer block"
                 >
-                  تطبيق RoadX للعملاء
+                  {isRTL ? 'تطبيق RoadX للعملاء' : 'RoadX Client App'}
                   <span className="block text-[11px] text-slate-400 mt-0.5">
-                    حالة المتاجر والروابط
+                    {isRTL ? 'حالة المتاجر والروابط' : 'Store links & status'}
                   </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => onOpenDownloadModal('business')}
-                  className="w-full py-2.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-right font-medium rx-transition cursor-pointer block"
+                  className="w-full py-2.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-start font-medium rx-transition cursor-pointer block"
                 >
-                  تطبيق RoadX Business
+                  {isRTL ? 'تطبيق RoadX Business' : 'RoadX Business App'}
                   <span className="block text-[11px] text-slate-400 mt-0.5">
-                    لمقدمي خدمات السيارات
+                    {isRTL ? 'لمقدمي خدمات السيارات' : 'For service providers'}
                   </span>
                 </button>
               </div>
@@ -867,10 +1008,15 @@ export const WhyFaqAndCtaSections: React.FC<WhyFaqAndCtaSectionsProps> = ({
 
           <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
             <p>
-              © {new Date().getFullYear()} {COMPANY_LEGAL_INFO.legalName} (RoadX Egypt). جميع الحقوق محفوظة.
+              © {new Date().getFullYear()} {COMPANY_LEGAL_INFO.legalName} (RoadX Egypt).{' '}
+              {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}
             </p>
             <p>
-              المعرف الضريبي: <span dir="ltr" className="font-mono-tabular text-slate-400">{COMPANY_LEGAL_INFO.taxId}</span> · القاهرة، مصر
+              {isRTL ? 'المعرف الضريبي:' : 'Tax ID:'}{' '}
+              <span dir="ltr" className="font-mono-tabular text-slate-400">
+                {COMPANY_LEGAL_INFO.taxId}
+              </span>{' '}
+              · {isRTL ? 'القاهرة، مصر' : 'Cairo, Egypt'}
             </p>
           </div>
         </div>

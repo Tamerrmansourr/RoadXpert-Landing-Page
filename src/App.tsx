@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { PageView } from './config/siteConfig';
 import { ContactInquiryInput } from './utils/validation';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { Navbar } from './components/Navbar';
 import { HeroAndAboutSections } from './components/HeroAndAboutSections';
 import { DashcamAndDangerSections } from './components/DashcamAndDangerSections';
@@ -14,7 +15,9 @@ import { WhyFaqAndCtaSections } from './components/WhyFaqAndCtaSections';
 import { SubPagesView } from './components/SubPagesView';
 import { DownloadModal } from './components/DownloadModal';
 
-export default function App() {
+function AppShell() {
+  const { lang, isRTL } = useLanguage();
+
   const [currentPage, setCurrentPage] = useState<PageView>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -84,7 +87,11 @@ export default function App() {
   };
 
   return (
-    <div dir="rtl" lang="ar" className="min-h-screen flex flex-col bg-white text-slate-900">
+    <div
+      dir={isRTL ? 'rtl' : 'ltr'}
+      lang={lang}
+      className="min-h-screen flex flex-col bg-white text-slate-900"
+    >
       {/* SECTION 01 — STICKY NAVBAR */}
       <Navbar
         currentPage={currentPage}
@@ -159,5 +166,13 @@ export default function App() {
         }}
       />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppShell />
+    </LanguageProvider>
   );
 }

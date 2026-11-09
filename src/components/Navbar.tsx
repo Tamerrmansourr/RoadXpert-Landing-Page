@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Menu, X, Download, ArrowRight } from 'lucide-react';
-import { NAVBAR_LINKS, PageView } from '../config/siteConfig';
+import { Menu, X, Download, ArrowLeft, ArrowRight, Globe } from 'lucide-react';
+import { NAVBAR_LINKS_BY_LANG, PageView } from '../config/siteConfig';
+import { useLanguage } from '../context/LanguageContext';
 import { BrandLogo } from './BrandLogo';
 
 interface NavbarProps {
@@ -14,7 +15,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigatePage,
   onOpenDownloadModal,
 }) => {
+  const { lang, toggleLang, isRTL } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navLinks = NAVBAR_LINKS_BY_LANG[lang];
 
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -28,12 +32,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-8">
-        {/* Zone 1: Brand Wordmark & Original Logo (One Line) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-6">
+        {/* Zone 1: Brand Wordmark & Original Logo */}
         <a
           href="#hero"
           onClick={(e) => handleNavClick(e, '#hero')}
-          aria-label="RoadX الصفحة الرئيسية"
+          aria-label={isRTL ? 'RoadXpert Technology الصفحة الرئيسية' : 'RoadXpert Technology Home'}
           className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0052CC] rounded-md whitespace-nowrap shrink-0"
         >
           <BrandLogo size="md" />
@@ -41,10 +45,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Zone 2: Primary Single-Line Navigation Links */}
         <nav
-          aria-label="التنقل الرئيسي"
+          aria-label={isRTL ? 'التنقل الرئيسي' : 'Main Navigation'}
           className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600"
         >
-          {NAVBAR_LINKS.map((item) => (
+          {navLinks.map((item) => (
             <a
               key={item.id}
               href={item.href}
@@ -56,16 +60,27 @@ export const Navbar: React.FC<NavbarProps> = ({
           ))}
         </nav>
 
-        {/* Zone 3: Primary Action Button + Mobile Menu Trigger */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Zone 3: Language Toggle + Primary Action Button + Mobile Menu Trigger */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {/* Top Language Switcher Button */}
+          <button
+            type="button"
+            onClick={toggleLang}
+            aria-label={lang === 'en' ? 'تحويل اللغة إلى العربية' : 'Switch language to English'}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:text-[#0052CC] bg-slate-100 hover:bg-slate-200/80 rounded-lg rx-transition whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[#0052CC]"
+          >
+            <Globe className="w-4 h-4 text-[#0052CC]" />
+            <span>{lang === 'en' ? 'العربية' : 'English'}</span>
+          </button>
+
           {currentPage !== 'home' ? (
             <button
               type="button"
               onClick={() => onNavigatePage('home', 'hero')}
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg rx-transition whitespace-nowrap shrink-0 cursor-pointer"
             >
-              <ArrowRight className="w-4 h-4" />
-              <span>العودة للرئيسية</span>
+              {isRTL ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
+              <span>{isRTL ? 'العودة للرئيسية' : 'Back to Home'}</span>
             </button>
           ) : (
             <button
@@ -74,7 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#0052CC] hover:bg-[#0043A8] active:bg-[#00368A] rounded-lg rx-transition whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0052CC]"
             >
               <Download className="w-4 h-4" />
-              <span>حمّل RoadX</span>
+              <span>{isRTL ? 'حمّل RoadX' : 'Download RoadX'}</span>
             </button>
           )}
 
@@ -83,7 +98,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-navigation-drawer"
-            aria-label={mobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
+            aria-label={
+              mobileMenuOpen
+                ? isRTL
+                  ? 'إغلاق القائمة'
+                  : 'Close menu'
+                : isRTL
+                ? 'فتح القائمة'
+                : 'Open menu'
+            }
             className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg text-slate-700 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-[#0052CC] cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -97,8 +120,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           id="mobile-navigation-drawer"
           className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 shadow-lg"
         >
-          <nav aria-label="قائمة الموبايل" className="flex flex-col space-y-1">
-            {NAVBAR_LINKS.map((item) => (
+          <nav
+            aria-label={isRTL ? 'قائمة الموبايل' : 'Mobile Navigation'}
+            className="flex flex-col space-y-1"
+          >
+            {navLinks.map((item) => (
               <a
                 key={item.id}
                 href={item.href}
@@ -120,7 +146,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 className="hover:text-[#0052CC] underline cursor-pointer"
               >
-                صفحة من نحن
+                {isRTL ? 'صفحة من نحن' : 'About Page'}
               </button>
               <span aria-hidden="true">·</span>
               <button
@@ -131,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 className="hover:text-[#0052CC] underline cursor-pointer"
               >
-                صفحة RoadX Business
+                {isRTL ? 'صفحة RoadX Business' : 'RoadX Business Page'}
               </button>
               <span aria-hidden="true">·</span>
               <button
@@ -142,7 +168,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 className="hover:text-[#0052CC] underline cursor-pointer"
               >
-                الدعم
+                {isRTL ? 'الدعم' : 'Support'}
               </button>
             </div>
             <button
@@ -153,7 +179,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className="w-full py-2.5 px-4 rounded-lg bg-[#0052CC] text-white font-semibold text-sm text-center hover:bg-[#0043A8] cursor-pointer"
             >
-              حمّل تطبيق RoadX
+              {isRTL ? 'حمّل تطبيق RoadX' : 'Download RoadX App'}
             </button>
           </div>
         </div>

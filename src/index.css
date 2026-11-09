@@ -8,8 +8,8 @@
     --rx-carbon: #111317;
     --rx-slate-dark: #0B0F17;
     --rx-danger: #DC2626;
-    --font-display: 'Cairo', 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
-    --font-sans: 'IBM Plex Sans Arabic', 'Cairo', system-ui, -apple-system, sans-serif;
+    --font-display: 'Plus Jakarta Sans', 'Cairo', 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', 'IBM Plex Sans Arabic', 'Cairo', system-ui, -apple-system, sans-serif;
     --font-mono: 'IBM Plex Mono', monospace;
   }
 

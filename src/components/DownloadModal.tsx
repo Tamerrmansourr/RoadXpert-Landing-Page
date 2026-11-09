@@ -1,6 +1,7 @@
 import React from 'react';
-import { X, Smartphone, Briefcase, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { X, Smartphone, Briefcase, CheckCircle2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { LAUNCH_CONFIG } from '../config/siteConfig';
+import { useLanguage } from '../context/LanguageContext';
 import { BrandLogo } from './BrandLogo';
 
 interface DownloadModalProps {
@@ -18,6 +19,8 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({
   onSwitchAppType,
   onGoToContact,
 }) => {
+  const { lang, isRTL } = useLanguage();
+
   if (!isOpen) return null;
 
   return (
@@ -36,7 +39,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            aria-label="إغلاق النافذة"
+            aria-label={lang === 'en' ? 'Close modal' : 'إغلاق النافذة'}
             className="w-9 h-9 rounded-lg text-slate-500 hover:bg-slate-100 flex items-center justify-center cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -55,7 +58,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({
             }`}
           >
             <Smartphone className="w-4 h-4" />
-            <span>تطبيق RoadX للعملاء</span>
+            <span>{lang === 'en' ? 'RoadX Driver App' : 'تطبيق RoadX للعملاء'}</span>
           </button>
           <button
             type="button"
@@ -67,7 +70,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({
             }`}
           >
             <Briefcase className="w-4 h-4" />
-            <span>تطبيق RoadX Business</span>
+            <span>{lang === 'en' ? 'RoadX Business App' : 'تطبيق RoadX Business'}</span>
           </button>
         </div>
 
@@ -77,22 +80,36 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({
               id="download-modal-title"
               className="font-display font-bold text-xl text-slate-950"
             >
-              تحميل تطبيق RoadX للسائقين وأصحاب السيارات
+              {lang === 'en'
+                ? 'Download RoadX for Drivers & Car Owners'
+                : 'تحميل تطبيق RoadX للسائقين وأصحاب السيارات'}
             </h2>
             <p className="text-sm text-slate-600 leading-relaxed">
-              يجمع التطبيق بين تسجيل الطريق (Dashcam)، تنبيهات النعاس بالذكاء الاصطناعي، وضع الخطر، والوصول إلى خدمات السيارات في مصر.
+              {lang === 'en'
+                ? 'Combines road video recording (Dashcam), AI drowsiness monitoring, Danger Mode, and access to automotive services across Egypt.'
+                : 'يجمع التطبيق بين تسجيل الطريق (Dashcam)، تنبيهات النعاس بالذكاء الاصطناعي، وضع الخطر، والوصول إلى خدمات السيارات في مصر.'}
             </p>
 
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/90 space-y-2 text-xs text-slate-700">
               <div className="flex items-center gap-2 font-bold text-slate-900">
                 <CheckCircle2 className="w-4 h-4 text-[#0052CC]" />
-                <span>حالة روابط المتاجر الرسمية:</span>
+                <span>
+                  {lang === 'en'
+                    ? 'Official App Store Status:'
+                    : 'حالة روابط المتاجر الرسمية:'}
+                </span>
               </div>
               <p>
-                <strong>Android (Google Play):</strong> يتم ربط الزر برابط المتجر الرسمي فور اعتماده في إعدادات الإطلاق (`LAUNCH_CONFIG.googlePlayClientUrl`).
+                <strong>Android (Google Play):</strong>{' '}
+                {lang === 'en'
+                  ? 'Direct store download link activates immediately once configured in launch settings (`LAUNCH_CONFIG.googlePlayClientUrl`).'
+                  : 'يتم ربط الزر برابط المتجر الرسمي فور اعتماده في إعدادات الإطلاق (`LAUNCH_CONFIG.googlePlayClientUrl`).'}
               </p>
               <p>
-                <strong>iPhone (iOS):</strong> {LAUNCH_CONFIG.iosStatusText}
+                <strong>iPhone (iOS):</strong>{' '}
+                {lang === 'en'
+                  ? LAUNCH_CONFIG.iosStatusTextEn
+                  : LAUNCH_CONFIG.iosStatusText}
               </p>
             </div>
           </div>
@@ -102,19 +119,29 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({
               id="download-modal-title"
               className="font-display font-bold text-xl text-slate-950"
             >
-              تحميل تطبيق RoadX Business لمقدمي الخدمات
+              {lang === 'en'
+                ? 'Download RoadX Business for Service Providers'
+                : 'تحميل تطبيق RoadX Business لمقدمي الخدمات'}
             </h2>
             <p className="text-sm text-slate-600 leading-relaxed">
-              مخصص لأصحاب ومشغلي أوناش الإنقاذ، الميكانيكية، فنيي الكاوتش والإطارات، وكهربائية السيارات لاستقبال الطلبات المتاحة وإدارة العمل.
+              {lang === 'en'
+                ? 'Built for winch & recovery operators, mechanics, tire technicians, and auto electricians to receive and manage customer requests.'
+                : 'مخصص لأصحاب ومشغلي أوناش الإنقاذ، الميكانيكية، فنيي الكاوتش والإطارات، وكهربائية السيارات لاستقبال الطلبات المتاحة وإدارة العمل.'}
             </p>
 
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/90 space-y-2 text-xs text-slate-700">
               <div className="flex items-center gap-2 font-bold text-slate-900">
                 <CheckCircle2 className="w-4 h-4 text-[#0052CC]" />
-                <span>حالة رابط RoadX Business:</span>
+                <span>
+                  {lang === 'en'
+                    ? 'RoadX Business Link Status:'
+                    : 'حالة رابط RoadX Business:'}
+                </span>
               </div>
               <p>
-                يتم تفعيل رابط التحميل المباشر من المتجر فور إدراجه في (`LAUNCH_CONFIG.googlePlayBusinessUrl`)، ويمكنك الآن تسجيل بياناتك كمقدم خدمة للتواصل المباشر.
+                {lang === 'en'
+                  ? 'Direct store download activates once (`LAUNCH_CONFIG.googlePlayBusinessUrl`) is set. You can register your provider details now for direct onboarding.'
+                  : 'يتم تفعيل رابط التحميل المباشر من المتجر فور إدراجه في (`LAUNCH_CONFIG.googlePlayBusinessUrl`)، ويمكنك الآن تسجيل بياناتك كمقدم خدمة للتواصل المباشر.'}
               </p>
             </div>
           </div>
@@ -133,10 +160,18 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({
           >
             <span>
               {appType === 'business'
-                ? 'سجّل كمقدم خدمة في RoadX Business'
+                ? lang === 'en'
+                  ? 'Register as a RoadX Business Provider'
+                  : 'سجّل كمقدم خدمة في RoadX Business'
+                : lang === 'en'
+                ? 'Register for Launch Download Link'
                 : 'سجّل للحصول على رابط التحميل فور الإطلاق'}
             </span>
-            <ArrowLeft className="w-4 h-4" />
+            {isRTL ? (
+              <ArrowLeft className="w-4 h-4" />
+            ) : (
+              <ArrowRight className="w-4 h-4" />
+            )}
           </button>
 
           <button
@@ -144,7 +179,7 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({
             onClick={onClose}
             className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm cursor-pointer"
           >
-            إغلاق
+            {lang === 'en' ? 'Close' : 'إغلاق'}
           </button>
         </div>
       </div>

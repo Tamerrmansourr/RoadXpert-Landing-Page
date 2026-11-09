@@ -16,6 +16,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { BRAND_ASSETS } from '../config/siteConfig';
+import { useLanguage } from '../context/LanguageContext';
 
 export type HeroScreenMode = 'dashcam' | 'drowsiness' | 'danger' | 'services';
 
@@ -28,6 +29,7 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
   activeMode: controlledMode,
   onModeChange,
 }) => {
+  const { isRTL } = useLanguage();
   const [internalMode, setInternalMode] = useState<HeroScreenMode>('dashcam');
   const mode = controlledMode ?? internalMode;
 
@@ -38,10 +40,10 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
 
   return (
     <div className="relative mx-auto w-full max-w-[360px]">
-      {/* Mode Switcher Bar Above Phone (Interactive Segmented Buttons) */}
+      {/* Mode Switcher Bar Above Phone */}
       <div
         role="tablist"
-        aria-label="معاينة شاشات تطبيق RoadX"
+        aria-label={isRTL ? 'معاينة شاشات تطبيق RoadX' : 'RoadX App Screen Preview'}
         className="mb-4 grid grid-cols-4 gap-1 p-1 bg-slate-100 border border-slate-200/80 rounded-xl"
       >
         <button
@@ -68,7 +70,7 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          انتباه السائق
+          {isRTL ? 'انتباه السائق' : 'AI Alert'}
         </button>
         <button
           type="button"
@@ -81,7 +83,7 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          وضع الخطر
+          {isRTL ? 'وضع الخطر' : 'Danger'}
         </button>
         <button
           type="button"
@@ -94,7 +96,7 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          الخدمات
+          {isRTL ? 'الخدمات' : 'Services'}
         </button>
       </div>
 
@@ -111,12 +113,12 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
                 referrerPolicy="no-referrer"
                 className="w-6 h-6 rounded bg-white p-0.5 object-contain aspect-square"
               />
-              <span className="font-display font-bold text-sm tracking-tight text-white">
+              <span dir="ltr" className="font-display font-bold text-sm tracking-tight text-white">
                 RoadX
               </span>
             </div>
             <span className="text-[11px] text-slate-400">
-              معاينة توضيحية للواجهة
+              {isRTL ? 'معاينة توضيحية للواجهة' : 'Interactive UI Preview'}
             </span>
           </div>
 
@@ -124,7 +126,6 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
           <div className="p-4 flex-1 flex flex-col justify-between">
             {mode === 'dashcam' && (
               <div className="space-y-4">
-                {/* Road Perspective SVG Viewfinder */}
                 <div className="relative rounded-xl bg-slate-900 border border-white/10 h-48 overflow-hidden flex flex-col justify-between p-3">
                   <svg
                     viewBox="0 0 320 180"
@@ -170,7 +171,9 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
                   </svg>
 
                   <div className="relative z-10 flex items-center justify-between text-xs text-slate-200">
-                    <span className="font-medium">Dashcam · تسجيل الطريق</span>
+                    <span className="font-medium">
+                      {isRTL ? 'Dashcam · تسجيل الطريق' : 'Dashcam · Road View'}
+                    </span>
                     <span className="font-mono-tabular text-slate-300">
                       Loop · 03:00
                     </span>
@@ -178,22 +181,27 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
 
                   <div className="relative z-10 bg-slate-950/85 border border-white/10 rounded-lg px-3 py-2 flex items-center justify-between text-xs">
                     <span className="text-slate-300">
-                      التسجيل الدوري مفعل · يدعم الخلفية
+                      {isRTL
+                        ? 'التسجيل الدوري مفعل · يدعم الخلفية'
+                        : 'Loop Recording Active · Background Ready'}
                     </span>
                     <RotateCw className="w-3.5 h-3.5 text-[#0075FF] shrink-0" />
                   </div>
                 </div>
 
-                {/* Loop Recording & Trip Status */}
                 <div className="space-y-2.5">
                   <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
                     <Layers className="w-4 h-4 text-[#0075FF] shrink-0 mt-0.5" />
                     <div className="text-xs space-y-1">
                       <p className="font-semibold text-white">
-                        إدارة المقاطع تلقائيًا (Loop Recording)
+                        {isRTL
+                          ? 'إدارة المقاطع تلقائيًا (Loop Recording)'
+                          : 'Automated Clip Cycling (Loop Recording)'}
                       </p>
                       <p className="text-slate-400 leading-relaxed">
-                        يتم تقسيم الفيديو إلى مقاطع منتظمة واستبدال الأقدم غير المحمي عند امتلاء المساحة المخصصة.
+                        {isRTL
+                          ? 'يتم تقسيم الفيديو إلى مقاطع منتظمة واستبدال الأقدم غير المحمي عند امتلاء المساحة المخصصة.'
+                          : 'Segments road video into fixed clips and overwrites the oldest unlocked clip when allocated storage is full.'}
                       </p>
                     </div>
                   </div>
@@ -202,10 +210,14 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
                     <Navigation className="w-4 h-4 text-[#0075FF] shrink-0 mt-0.5" />
                     <div className="text-xs space-y-1">
                       <p className="font-semibold text-white">
-                        العمل في الخلفية وفق أذونات الجهاز
+                        {isRTL
+                          ? 'العمل في الخلفية وفق أذونات الجهاز'
+                          : 'Background Mode per Device Permissions'}
                       </p>
                       <p className="text-slate-400 leading-relaxed">
-                        استمر في متابعة الخرائط أثناء تسجيل الرحلة بشرط تفعيل أذونات النظام.
+                        {isRTL
+                          ? 'استمر في متابعة الخرائط أثناء تسجيل الرحلة بشرط تفعيل أذونات النظام.'
+                          : 'Keep following navigation maps while recording trips when OS permissions are enabled.'}
                       </p>
                     </div>
                   </div>
@@ -223,7 +235,6 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
                     <Eye className="w-4 h-4 text-[#60A5FA]" />
                   </div>
 
-                  {/* Driver Face Alignment Frame Illustration */}
                   <div className="h-32 rounded-lg bg-slate-950 border border-white/10 flex flex-col items-center justify-center p-3 text-center relative">
                     <svg
                       viewBox="0 0 120 80"
@@ -249,17 +260,23 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
                       <line x1="65" y1="35" x2="71" y2="35" stroke="#60A5FA" strokeWidth="2" />
                     </svg>
                     <span className="text-[11px] text-slate-300 mt-1">
-                      تحليل مؤشرات انتباه العين والوجه عبر الكاميرا
+                      {isRTL
+                        ? 'تحليل مؤشرات انتباه العين والوجه عبر الكاميرا'
+                        : 'Camera-based eye & facial attention analysis'}
                     </span>
                   </div>
 
                   <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-400/30 text-xs text-amber-200">
-                    تنبيه مساعد: عند رصد علامات نعاس متكررة، يصدر التطبيق تنبيهًا صوتيًا وبصريًا لتنبيه السائق.
+                    {isRTL
+                      ? 'تنبيه مساعد: عند رصد علامات نعاس متكررة، يصدر التطبيق تنبيهًا صوتيًا وبصريًا لتنبيه السائق.'
+                      : 'Assistive Alert: Issues audio & visual alerts when recurring signs of drowsiness are detected.'}
                   </div>
                 </div>
 
                 <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 leading-relaxed">
-                  أداة مساعدة لتعزيز الانتباه أثناء الرحلات، وتعتمد على زاوية تثبيت الهاتف والإضاءة ولا تغني عن الراحة الكافية.
+                  {isRTL
+                    ? 'أداة مساعدة لتعزيز الانتباه أثناء الرحلات، وتعتمد على زاوية تثبيت الهاتف والإضاءة ولا تغني عن الراحة الكافية.'
+                    : 'An assistive alertness tool dependent on mounting angle and lighting; never a substitute for adequate rest.'}
                 </div>
               </div>
             )}
@@ -269,33 +286,49 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
                 <div className="rounded-xl bg-red-950/40 border border-red-500/40 p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-red-300">
-                      Danger Mode · وضع الخطر
+                      {isRTL ? 'Danger Mode · وضع الخطر' : 'Danger Mode · Emergency'}
                     </span>
                     <ShieldAlert className="w-4 h-4 text-red-400" />
                   </div>
 
                   <p className="text-xs text-slate-200 leading-relaxed">
-                    تأمين فوري لتسجيل الفيديو الحالي مع تفعيل آليات إشعار جهات الطوارئ المحددة مسبقًا في حسابك.
+                    {isRTL
+                      ? 'تأمين فوري لتسجيل الفيديو الحالي مع تفعيل آليات إشعار جهات الطوارئ المحددة مسبقًا في حسابك.'
+                      : 'Immediate protection for active video footage while triggering alerts to your pre-selected emergency contacts.'}
                   </p>
 
                   <div className="space-y-2 pt-1">
                     <div className="flex items-center gap-2.5 text-xs text-slate-200 bg-black/30 p-2.5 rounded-lg border border-white/10">
                       <FolderLock className="w-4 h-4 text-red-400 shrink-0" />
-                      <span>قفل المقطع المسجل لمنع الكتابة فوقه</span>
+                      <span>
+                        {isRTL
+                          ? 'قفل المقطع المسجل لمنع الكتابة فوقه'
+                          : 'Locks active video clip from loop overwrite'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2.5 text-xs text-slate-200 bg-black/30 p-2.5 rounded-lg border border-white/10">
                       <PhoneCall className="w-4 h-4 text-red-400 shrink-0" />
-                      <span>تنبيه جهات الاتصال للطوارئ المختارة</span>
+                      <span>
+                        {isRTL
+                          ? 'تنبيه جهات الاتصال للطوارئ المختارة'
+                          : 'Notifies user-selected emergency contacts'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2.5 text-xs text-slate-200 bg-black/30 p-2.5 rounded-lg border border-white/10">
                       <CloudUpload className="w-4 h-4 text-red-400 shrink-0" />
-                      <span>حفظ سحابي (رهن الاتصال بالإنترنت والأذونات)</span>
+                      <span>
+                        {isRTL
+                          ? 'حفظ سحابي (رهن الاتصال بالإنترنت والأذونات)'
+                          : 'Cloud backup (subject to internet & permissions)'}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <p className="text-[11px] text-slate-400 leading-relaxed px-1">
-                  ملاحظة: التطبيق لا يتصل تلقائيًا بالإسعاف أو الشرطة، ولا يضمن وصول المساعدة الميدانية.
+                  {isRTL
+                    ? 'ملاحظة: التطبيق لا يتصل تلقائيًا بالإسعاف أو الشرطة، ولا يضمن وصول المساعدة الميدانية.'
+                    : 'Note: The app does not automatically call police or ambulance and does not guarantee physical rescue.'}
                 </p>
               </div>
             )}
@@ -303,35 +336,61 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
             {mode === 'services' && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-slate-300 pb-1">
-                  <span className="font-semibold text-white">خدمات الطريق والسيارات</span>
-                  <span>اختر التخصص المطلوب</span>
+                  <span className="font-semibold text-white">
+                    {isRTL ? 'خدمات الطريق والسيارات' : 'Roadside & Car Services'}
+                  </span>
+                  <span>{isRTL ? 'اختر التخصص المطلوب' : 'Select specialty'}</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
                     <Truck className="w-4 h-4 text-[#0075FF]" />
-                    <p className="text-xs font-bold text-white">ونش إنقاذ</p>
-                    <p className="text-[11px] text-slate-400">نقل ومساعدة على الطريق</p>
+                    <p className="text-xs font-bold text-white">
+                      {isRTL ? 'ونش إنقاذ' : 'Winch Recovery'}
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      {isRTL ? 'نقل ومساعدة على الطريق' : 'Towing & roadside help'}
+                    </p>
                   </div>
                   <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
                     <Wrench className="w-4 h-4 text-[#0075FF]" />
-                    <p className="text-xs font-bold text-white">ميكانيكي</p>
-                    <p className="text-[11px] text-slate-400">أعطال المحرك والصيانة</p>
+                    <p className="text-xs font-bold text-white">
+                      {isRTL ? 'ميكانيكي' : 'Auto Mechanic'}
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      {isRTL ? 'أعطال المحرك والصيانة' : 'Engine & repair'}
+                    </p>
                   </div>
                   <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
                     <Disc className="w-4 h-4 text-[#0075FF]" />
-                    <p className="text-xs font-bold text-white">فني كاوتش</p>
-                    <p className="text-[11px] text-slate-400">إطارات وضبط هواء</p>
+                    <p className="text-xs font-bold text-white">
+                      {isRTL ? 'فني كاوتش' : 'Tire Specialist'}
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      {isRTL ? 'إطارات وضبط هواء' : 'Tires & air pressure'}
+                    </p>
                   </div>
                   <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
                     <BatteryCharging className="w-4 h-4 text-[#0075FF]" />
-                    <p className="text-xs font-bold text-white">كهربائي سيارات</p>
-                    <p className="text-[11px] text-slate-400">بطارية ودينامو وضفيرة</p>
+                    <p className="text-xs font-bold text-white">
+                      {isRTL ? 'كهربائي سيارات' : 'Auto Electrician'}
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      {isRTL ? 'بطارية ودينامو وضفيرة' : 'Battery & electrical'}
+                    </p>
                   </div>
                 </div>
 
                 <div className="p-3 rounded-xl bg-[#0052CC]/20 border border-[#0052CC]/40 text-xs text-slate-200 leading-relaxed">
-                  متصل بمنظومة <span className="font-semibold text-white">RoadX Business</span> لربط السائق بمقدمي الخدمة المتاحين أو استعراضهم عبر الدليل.
+                  {isRTL ? (
+                    <>
+                      متصل بمنظومة <span className="font-semibold text-white">RoadX Business</span> لربط السائق بمقدمي الخدمة المتاحين أو استعراضهم عبر الدليل.
+                    </>
+                  ) : (
+                    <>
+                      Connected to <span className="font-semibold text-white">RoadX Business</span> to link drivers with available providers or directory listings.
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -356,7 +415,7 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>الانتباه</span>
+                <span>{isRTL ? 'الانتباه' : 'AI Alert'}</span>
               </button>
               <button
                 type="button"
@@ -366,7 +425,7 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
                 }`}
               >
                 <ShieldAlert className="w-3.5 h-3.5" />
-                <span>الخطر</span>
+                <span>{isRTL ? 'الخطر' : 'Danger'}</span>
               </button>
               <button
                 type="button"
@@ -376,7 +435,7 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
                 }`}
               >
                 <Wrench className="w-3.5 h-3.5" />
-                <span>الخدمات</span>
+                <span>{isRTL ? 'الخدمات' : 'Services'}</span>
               </button>
             </div>
           </div>
@@ -386,22 +445,52 @@ export const HeroPhoneMockup: React.FC<HeroPhoneMockupProps> = ({
   );
 };
 
-/**
- * Dual Interactive Phone Showcase for RoadX Business (Service Providers)
- */
 export const BusinessDualPhonesMockup: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<'winch' | 'mechanic' | 'tires' | 'electrician'>('winch');
+  const { isRTL } = useLanguage();
+  const [selectedCategory, setSelectedCategory] = useState<
+    'winch' | 'mechanic' | 'tires' | 'electrician'
+  >('winch');
 
-  const categoryLabels = {
-    winch: { title: 'ونش إنقاذ', sampleTask: 'طلب نقل سيارة متعطلة — محور المشير / التجمع' },
-    mechanic: { title: 'ميكانيكي سيارات', sampleTask: 'طلب فحص عطل حرارة محرك — مدينة نصر' },
-    tires: { title: 'فني كاوتش وإطارات', sampleTask: 'طلب إصلاح إطار / تغيير استبن — الشيخ زايد' },
-    electrician: { title: 'كهربائي سيارات', sampleTask: 'طلب فحص بطارية ودينامو — المعادي' },
-  };
+  const categoryLabels = isRTL
+    ? {
+        winch: {
+          title: 'ونش إنقاذ',
+          sampleTask: 'طلب نقل سيارة متعطلة — محور المشير / التجمع',
+        },
+        mechanic: {
+          title: 'ميكانيكي سيارات',
+          sampleTask: 'طلب فحص عطل حرارة محرك — مدينة نصر',
+        },
+        tires: {
+          title: 'فني كاوتش وإطارات',
+          sampleTask: 'طلب إصلاح إطار / تغيير استبن — الشيخ زايد',
+        },
+        electrician: {
+          title: 'كهربائي سيارات',
+          sampleTask: 'طلب فحص بطارية ودينامو — المعادي',
+        },
+      }
+    : {
+        winch: {
+          title: 'Winch Recovery',
+          sampleTask: 'Vehicle towing request — El-Moshir Axis / New Cairo',
+        },
+        mechanic: {
+          title: 'Auto Mechanic',
+          sampleTask: 'Engine overheating inspection — Nasr City',
+        },
+        tires: {
+          title: 'Tire Specialist',
+          sampleTask: 'Tire repair / spare wheel mount — Sheikh Zayed',
+        },
+        electrician: {
+          title: 'Auto Electrician',
+          sampleTask: 'Battery & alternator check — Maadi',
+        },
+      };
 
   return (
     <div className="space-y-4">
-      {/* Interactive Provider Specialty Selector */}
       <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-slate-900 border border-white/10 rounded-xl">
         {(['winch', 'mechanic', 'tires', 'electrician'] as const).map((cat) => (
           <button
@@ -426,7 +515,7 @@ export const BusinessDualPhonesMockup: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
                 <span className="font-display font-bold text-xs text-white">
-                  RoadX Business · الطلبات
+                  {isRTL ? 'RoadX Business · الطلبات' : 'RoadX Business · Requests'}
                 </span>
                 <span className="text-[11px] text-[#60A5FA]">
                   {categoryLabels[selectedCategory].title}
@@ -434,28 +523,40 @@ export const BusinessDualPhonesMockup: React.FC = () => {
               </div>
 
               <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-2">
-                <p className="text-[11px] text-slate-400">نموذج توضيحي لطلب وارد</p>
+                <p className="text-[11px] text-slate-400">
+                  {isRTL ? 'نموذج توضيحي لطلب وارد' : 'Sample incoming service request'}
+                </p>
                 <p className="text-xs font-semibold text-white leading-relaxed">
                   {categoryLabels[selectedCategory].sampleTask}
                 </p>
                 <div className="pt-1 flex items-center justify-between text-[11px] text-slate-300">
-                  <span>عرض تفاصيل الموقع والسيارة</span>
-                  <span className="text-[#60A5FA] font-medium">متاح للرد</span>
+                  <span>
+                    {isRTL ? 'عرض تفاصيل الموقع والسيارة' : 'View location & vehicle details'}
+                  </span>
+                  <span className="text-[#60A5FA] font-medium">
+                    {isRTL ? 'متاح للرد' : 'Available'}
+                  </span>
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                 <p className="text-xs font-medium text-slate-300">
-                  تحديث حالة التفرغ والاستقبال
+                  {isRTL
+                    ? 'تحديث حالة التفرغ والاستقبال'
+                    : 'Availability & Receiving Status'}
                 </p>
                 <p className="text-[11px] text-slate-400">
-                  يتحكم مقدم الخدمة في أوقات استقبال الطلبات حسب تفرغه الفعلي.
+                  {isRTL
+                    ? 'يتحكم مقدم الخدمة في أوقات استقبال الطلبات حسب تفرغه الفعلي.'
+                    : 'Providers control when they receive requests based on real availability.'}
                 </p>
               </div>
             </div>
 
             <div className="pt-2 border-t border-white/10 text-[11px] text-slate-400 flex items-center justify-between">
-              <span>شاشة 01 · استقبال الطلبات</span>
+              <span>
+                {isRTL ? 'شاشة 01 · استقبال الطلبات' : 'Screen 01 · Incoming Feed'}
+              </span>
               <CheckCircle2 className="w-3.5 h-3.5 text-[#0075FF]" />
             </div>
           </div>
@@ -467,26 +568,36 @@ export const BusinessDualPhonesMockup: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
                 <span className="font-display font-bold text-xs text-white">
-                  RoadX Business · إدارة العمل
+                  {isRTL ? 'RoadX Business · إدارة العمل' : 'RoadX Business · Workflow'}
                 </span>
-                <span className="text-[11px] text-slate-400">متابعة التنفيذ</span>
+                <span className="text-[11px] text-slate-400">
+                  {isRTL ? 'متابعة التنفيذ' : 'Job Tracking'}
+                </span>
               </div>
 
               <div className="space-y-2">
                 <div className="p-2.5 rounded-lg bg-[#0052CC]/20 border border-[#0052CC]/40 text-xs text-white">
-                  1. مراجعة نوع العطل أو الخدمة المطلوبة
+                  {isRTL
+                    ? '1. مراجعة نوع العطل أو الخدمة المطلوبة'
+                    : '1. Review issue type & requested service'}
                 </div>
                 <div className="p-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-slate-300">
-                  2. قبول الطلب والتوجه أو التواصل مع العميل
+                  {isRTL
+                    ? '2. قبول الطلب والتوجه أو التواصل مع العميل'
+                    : '2. Accept request & coordinate with driver'}
                 </div>
                 <div className="p-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-slate-300">
-                  3. تحديث حالة الطلب عند إتمام الخدمة
+                  {isRTL
+                    ? '3. تحديث حالة الطلب عند إتمام الخدمة'
+                    : '3. Update job status upon completion'}
                 </div>
               </div>
             </div>
 
             <div className="pt-2 border-t border-white/10 text-[11px] text-slate-400 flex items-center justify-between">
-              <span>شاشة 02 · تنظيم حالة الخدمة</span>
+              <span>
+                {isRTL ? 'شاشة 02 · تنظيم حالة الخدمة' : 'Screen 02 · Status Management'}
+              </span>
               <Wrench className="w-3.5 h-3.5 text-[#0075FF]" />
             </div>
           </div>
