@@ -43,7 +43,7 @@ export interface FaqItem {
 }
 
 export const BRAND_ASSETS = {
-  logoSquare: '/assets/aistudio/RX_logo_square_c5f2dfff.png',
+  logoSquare: './assets/aistudio/RX_logo_square_c5f2dfff.png',
   brandName: 'RoadX',
   businessBrandName: 'RoadX Business',
   tagline: 'RoadX — أمان أكثر، وخدمات أقرب.',
