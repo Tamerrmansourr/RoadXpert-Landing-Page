@@ -1,0 +1,6 @@
+{
+  "name": "RoadX — أمان أكثر، وخدمات أقرب",
+  "description": "RoadX منظومة تقنية للقيادة الآمنة وخدمات السيارات في مصر. سجل رحلتك بـ Dashcam، تابع تنبيهات النعاس بالذكاء الاصطناعي، استخدم وضع الخطر، واكتشف خدمات الطريق من مكان واحد.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
